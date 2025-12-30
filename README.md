@@ -71,6 +71,88 @@ Hello World!
 
 **But**, if you click on the little _hamburger_ icon in the top-right corner, select "Traffic /Ports", type `3000` in the "Custom Ports" edit box and click on the "Access" button, you get an annoying "502 Bad Gateway" response, according to the documentation which says: _"The services need to run on all interfaces (like 0.0.0.0) and not just localhost"_.
 
+If you are the owner of the source code, like in this situation, the fix is easy, you just follow the documenation and change `localhost` to `0.0.0.0` and it will work. Have a try:
+
+```javascript
+// server.mjs
+import { createServer } from 'node:http';
+
+const server = createServer((req, res) => {
+  res.writeHead(200, { 'Content-Type': 'text/plain' });
+  res.end('Hello World!\n');
+});
+
+// starts a simple http server locally on port 3000
+server.listen(3000, '0.0.0.0', () => {
+  console.log('Listening on 0.0.0.0:3000');
+});
+
+// run with `node server.mjs`
+```
+
+Let's now revert the situation to `localhost` and see how we can workaround the limitation in another way :-)
+
+> A realistic example would be if you want to test the [Develop with containers](https://docs.docker.com/get-started/introduction/develop-with-containers/) hands-on guide from [Docker](https://docs.docker.com/). That's actually why I search for a workaround ;-)
+
+The trick is to use a NGINX instance with the following reverse proxy configuration:
+
+```nginx
+events {
+  worker_connections 768;
+}
+
+http {
+  server {
+    listen 0.0.0.0:8080;
+
+    location / {
+      proxy_pass http://localhost:3000/;
+    }
+
+  }
+}
+```
+
+You will then have an HTTP service running on `0.0.0.0` (port `8080`, or the one you like) and the only thing it will do is to transfer the requests to `localhost` (port `3000`).
+
+Let's first install NGINX:
+
+```text
+sudo apt update
+```
+
+```text
+sudo apt install -y nginx
+```
+
+```text
+systemctl status nginx
+```
+
+You can test the installation by clicking on the little _hamburger_ icon in the top-right corner, select "Traffic /Ports" and click on `80` in the "Common Ports" section.
+
+Let's backup the origniam `nginx.conf` file:
+
+```text
+sudo mv /etc/nginx/nginx.conf /etc/nginx/nginx.conf.bak
+```
+
+and create our new `nginx.conf` file:
+
+```text
+sudo vi /etc/nginx/nginx.conf
+```
+
+to copy-paste the content above.
+
+Then, we still need to update NGINX with this new configuration:
+
+```text
+sudo nginx -s reload
+```
+
+You can test this configuration by clicking on the little _hamburger_ icon in the top-right corner, select "Traffic /Ports" and click on `8080` in the "Common Ports" section. You should now see the response coming from the HTTP service running just on `localhost`. **Yes!**
+
 ## References
 
 - <https://nodejs.org/en/download>
