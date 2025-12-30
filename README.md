@@ -69,6 +69,8 @@ which should give the following response:
 Hello World!
 ```
 
+**But**, if you click on the little _hamburger_ icon in the top-right corner, select "Traffic /Ports", type `3000` in the "Custom Ports" edit box and click on the "Access" button, you get an annoying "502 Bad Gateway" response, according to the documentation which says: _"The services need to run on all interfaces (like 0.0.0.0) and not just localhost"_.
+
 ## References
 
 - <https://nodejs.org/en/download>
