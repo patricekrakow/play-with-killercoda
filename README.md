@@ -2,6 +2,8 @@
 
 I am *BIG* fan of [Killercoda](https://killercoda.com/) and especially their [Ubuntu Playground](https://killercoda.com/playgrounds/scenario/ubuntu) that I am using of all sorts of exploration.
 
+## The Problem
+
 There is only one ***ANNOYING*** anti-feature being that you can only access HTTP services running on **all** interfaces (like `0.0.0.0`), which means that when you want to test an HTTP service running just on `localhost`, it does not work :-( This is very frustrating... until I find a workaround that I would like to share here ;-)
 
 Let's first show the issue using the *classic* HTTP server you can get from a few lines of JavaScript using [Node.js](https://nodejs.org/en).
@@ -93,6 +95,8 @@ server.listen(3000, '0.0.0.0', () => {
 Let's now revert the situation to `localhost` and see how we can workaround the limitation in another way :-)
 
 > A realistic example would be if you want to test the [Develop with containers](https://docs.docker.com/get-started/introduction/develop-with-containers/) hands-on guide from [Docker](https://docs.docker.com/). That's actually why I search for a workaround ;-)
+
+## The Workaround
 
 The trick is to use a NGINX instance with the following reverse proxy configuration:
 
